@@ -1,0 +1,2 @@
+matplotlib~=3.9.2
+rclpy~=3.3.14
