@@ -163,7 +163,6 @@ class motion_executioner(Node):
         # Up to a limit of 500 times, increment the number of times this timer has been called to increase the linear velocity.
         if self.timer_call_count < 500:
             self.timer_call_count += 1
-        print(self.timer_call_count)
         return msg
 
     # Function to generate the straight line twist.
