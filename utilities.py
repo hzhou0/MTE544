@@ -1,3 +1,4 @@
+# Import relevant libraries.
 import math
 import json
 from math import atan2, asin, sqrt
@@ -24,7 +25,7 @@ class Logger:
 
     def log_values(self, values_list: list):
         with open(self.filename, "a") as file:
-            # TODO Part 5: Write the values from the list to the file
+            # Write each value in the list as a CSV with a preceeding comma and a new line at the end.
             file.write(",".join(json.dumps(v) for v in values_list) + "\n")
 
     def save_log(self):
@@ -73,7 +74,7 @@ class FileReader:
         return headers, table
 
 
-# TODO Part 5: Implement the conversion from Quaternion to Euler Angles
+# Function for converting from Quaternion to Euler Angles.
 def euler_from_quaternion(quat: list[float]):
     """
     Convert quaternion (w in last place) to euler roll, pitch, yaw.
@@ -81,19 +82,12 @@ def euler_from_quaternion(quat: list[float]):
     """
     x, y, z, w = quat
 
-    # Roll (x-axis rotation)
-    sinr_cosp = 2 * (w * x + y * z)
-    cosr_cosp = 1 - 2 * (x * x + y * y)
-    roll = math.atan2(sinr_cosp, cosr_cosp)
+    # Looking at the first two elements of the first row of the Euler Angle's matrix,
+    # cos and sin of alpha (yaw angle) are multiplied by a common factor of cos(beta).
+    # From the Quaternion to Rotation matrix, the following can be found.
+    cosa_cosb = (w * w) + (x * x) - (y * y) - (z * z)
+    sina_cosb = 2 * ((w * z) + (x * y))
 
-    # Pitch (y-axis rotation)
-    sinp = 2 * (w * y - z * x)
-    if abs(sinp) >= 1: # to handle gimbal lock
-        pitch = math.copysign(math.pi / 2, sinp)  # use 90 degrees if out of range
-    else:
-        pitch = math.asin(sinp)
-
-    siny_cosp = 2 * (w * z + x * y)
-    cosy_cosp = 1 - 2 * (y * y + z * z)
-    yaw = math.atan2(siny_cosp, cosy_cosp)
+    # Unpack the yaw by taking the inverse tangent and return it.
+    yaw = math.atan2(sina_cosb, cosa_cosb)
     return yaw
