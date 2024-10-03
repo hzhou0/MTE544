@@ -110,7 +110,7 @@ class motion_executioner(Node):
     # Callback function for LaserScan to log data.
     def laser_callback(self, laser_msg: LaserScan):
         # Log the range data and angular increment along with the timestamp in nanoseconds.
-        self.imu_logger.log_values(
+        self.laser_logger.log_values(
             [
                 laser_msg.ranges.tolist(),
                 laser_msg.angle_increment,
@@ -151,7 +151,7 @@ class motion_executioner(Node):
         msg = Twist()
         # To move in a circle, set the robot to have a constant linear velocity in the x-direction, and a constant angular velocity.
         msg.linear.x = 1.0
-        msg.angular.z = 0.5
+        msg.angular.z = 2.0
         return msg
 
     # Function to generate the sprial twist.
@@ -159,7 +159,7 @@ class motion_executioner(Node):
         msg = Twist()
         # To make a spiral twist, set the robot to have an increasing linear velocity in the x-direction, and a constant angular velocity.
         msg.linear.x = self.timer_call_count * 0.002
-        msg.angular.z = 0.5
+        msg.angular.z = 2.0
         # Up to a limit of 500 times, increment the number of times this timer has been called to increase the linear velocity.
         if self.timer_call_count < 500:
             self.timer_call_count += 1
