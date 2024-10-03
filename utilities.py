@@ -1,6 +1,7 @@
 # Import relevant libraries.
 import math
 import json
+import re
 from math import atan2, asin, sqrt
 
 M_PI = 3.1415926535
@@ -39,8 +40,8 @@ class FileReader:
     def read_file(self):
         read_headers = False
 
-        table = []
-        headers = []
+        table: list[list[any]] = []
+        headers: list[str] = []
         with open(self.filename, "r") as file:
             # Skip the header line
 
@@ -60,14 +61,18 @@ class FileReader:
 
             # Read each line and extract values
             for line in file:
-                values = line.strip().split(",")
+                if line[0]=='[':
+                    end=line.find(']')
+                    values=[line[:end+1]]+line[end+2:].strip().split(",")
+                else:
+                    values = line.strip().split(",")
 
                 row = []
 
                 for val in values:
                     if val == "":
                         break
-                    row.append(float(val.strip()))
+                    row.append(json.loads(val.strip()))
 
                 table.append(row)
 
