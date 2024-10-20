@@ -66,7 +66,8 @@ class PID_ctrl:
             # for example dt=0.1 overwriting the calculation          
             
             # TODO Part 5: calculate the error dot 
-            # error_dot+= ... 
+            # Sum up the difference in error divided by difference in time for pairs of samples.
+            error_dot += (self.history[i][0] - self.history[i-1][0]) / dt
             
         error_dot/=len(self.history)
         dt_avg/=len(self.history)
@@ -75,27 +76,28 @@ class PID_ctrl:
         sum_=0
         for hist in self.history:
             # TODO Part 5: Gather the integration
-            # sum_+=...
-            pass
+            # Add up all errors.
+            sum_ += hist[0]
         
         error_int=sum_*dt_avg
         
         # TODO Part 4: Log your errors
-        self.logger.log_values( ... )
+        self.logger.log_values([latest_error, error_dot, error_int])
         
         # TODO Part 4: Implement the control law of P-controller
         if self.type == P:
-            return ... # complete
+            # Calculate the P control.
+            return (self.kp * latest_error)
         
         # TODO Part 5: Implement the control law corresponding to each type of controller
         elif self.type == PD:
-            pass
-            # return ... # complete
+            # Calculate the PD control using the sum of the proportional and derivative components. 
+            return ((self.kp * latest_error) + (self.kd * error_dot))
         
         elif self.type == PI:
-            pass
-            # return ... # complete
+            # Calculate the PI control using the sum of the proportional and integral components. 
+            return ((self.kp * latest_error) + (self.ki * error_int))
         
         elif self.type == PID:
-            pass
-            # return ... # complete
+            # Calculate the PID control using the sum of the proportional, integral, and derivative components. 
+            return ((self.kp * latest_error) + (self.ki * error_int) + (self.kd * error_dot))
