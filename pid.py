@@ -82,7 +82,7 @@ class PID_ctrl:
         error_int=sum_*dt_avg
         
         # TODO Part 4: Log your errors
-        self.logger.log_values([latest_error, error_dot, error_int])
+        self.logger.log_values([latest_error, error_dot, error_int, Time.from_msg(stamp).nanoseconds])
         
         # TODO Part 4: Implement the control law of P-controller
         if self.type == P:
@@ -92,7 +92,7 @@ class PID_ctrl:
         # TODO Part 5: Implement the control law corresponding to each type of controller
         elif self.type == PD:
             # Calculate the PD control using the sum of the proportional and derivative components. 
-            return ((self.kp * latest_error) + (self.kd * error_dot))
+            return ((self.kp * latest_error) + (self.kv * error_dot))
         
         elif self.type == PI:
             # Calculate the PI control using the sum of the proportional and integral components. 
@@ -100,4 +100,4 @@ class PID_ctrl:
         
         elif self.type == PID:
             # Calculate the PID control using the sum of the proportional, integral, and derivative components. 
-            return ((self.kp * latest_error) + (self.ki * error_int) + (self.kd * error_dot))
+            return ((self.kp * latest_error) + (self.ki * error_int) + (self.kv * error_dot))
