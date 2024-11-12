@@ -33,7 +33,7 @@ class decision_maker(Node):
 
 
         # TODO Part 3: use the Kalman Filter
-        self.localizer=localization(...)
+        self.localizer=localization(type=kalmanFilter,dt=0.01)
         
         if motion_type==POINT_PLANNER:
             self.controller=controller(klp=0.2, klv=0.5, kap=0.8, kav=0.6)      
@@ -132,8 +132,8 @@ def main(args=None):
 
 
 if __name__=="__main__":
-    
-    argParser=argparse.ArgumentParser(description="point or trajectory") 
+
+    argParser=argparse.ArgumentParser(description="point or trajectory")
     argParser.add_argument("--motion", type=str, default="spiral")
     args = argParser.parse_args()
 
