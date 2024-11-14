@@ -34,6 +34,7 @@ class Logger:
             
             file.write(vals_str)
             
+            
 
     def save_log(self):
         pass

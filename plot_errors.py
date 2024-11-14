@@ -6,8 +6,9 @@ from utilities import FileReader
 
 def plot_errors(filename):
     
-    headers, values=FileReader(filename).read_file()
-    
+    headers, values=FileReader(filename[0]).read_file()
+    poseHeaders, poses=FileReader(filename[1]).read_file()
+    print(filename[1])
     time_list=[]
     
     first_stamp=values[0][-1]
@@ -15,13 +16,20 @@ def plot_errors(filename):
     for val in values:
         time_list.append(val[-1] - first_stamp)
 
-    
+    pose_time_list = []
+    pose_first_stamp = poses[0][-1]
+
+    for pose in poses:
+        pose_time_list.append(pose[-1] - pose_first_stamp)
+
     
     fig, axes = plt.subplots(2,1, figsize=(14,6))
 
 
-    axes[0].plot([lin[len(headers) - 3] for lin in values], [lin[len(headers) - 2] for lin in values])
+    axes[0].plot([lin[len(headers) - 3] for lin in values], [lin[len(headers) - 2] for lin in values], label = "Estimates")
+    axes[0].plot([lin[0] for lin in poses], [lin[1] for lin in poses], label = "Ground Truth")
     axes[0].set_title("state space")
+    axes[0].legend()
     axes[0].grid()
 
     
@@ -52,7 +60,8 @@ if __name__=="__main__":
     print("plotting the files", args.files)
 
     filenames=args.files
-    for filename in filenames:
-        plot_errors(filename)
+    plot_errors(filenames)
+    # for filename in filenames:
+    #     plot_errors(filename)
 
 

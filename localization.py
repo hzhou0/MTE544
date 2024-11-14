@@ -1,4 +1,5 @@
 import sys
+import os
 
 from utilities import Logger
 
@@ -26,17 +27,18 @@ import message_filters
 rawSensors = 0
 kalmanFilter = 1
 odom_qos = QoSProfile(reliability=2, durability=2, history=1, depth=10)
+#odom_qos = QoSProfile(reliability=2, durability=2, history=1, depth=10)
 
 
 class localization(Node):
     def __init__(
         self,
         type,
-        dt,
+        dt=None,
         loggerName="robotPose.csv",
         loggerHeaders=None,
     ):
-        super().__init__("localizer")
+        super().__init__(loggerName.split('.')[0])
 
         if loggerHeaders is None:
             loggerHeaders = [
@@ -51,11 +53,13 @@ class localization(Node):
                 "stamp",
             ]
         self.loc_logger = Logger(loggerName, loggerHeaders)
+        self.loc_logger2 = Logger('robotGroundTruth.csv', ['x','y','t'])
         self.pose = None
 
         if type == rawSensors:
             self.initRawSensors()
         elif type == kalmanFilter:
+            self.initRawSensors()
             self.initKalmanfilter(dt)
         else:
             print("We don't have this type for localization", sys.stderr)
@@ -71,19 +75,22 @@ class localization(Node):
 
         x = np.zeros(6)
 
-        Q = 0.5 * np.identity(6)
+        Q = float(os.environ.get('Q', '0.5'))* np.identity(6)
+        print(Q)
 
-        R = 0.5 * np.identity(4)
+        R = float(os.environ.get('R', '0.5')) * np.identity(4)
+        print(R)
 
-        P = np.zeros(
-            (6, 6)
-        )  # initial covariance set to zero, as position is typically reset and robots starts from rest
+        P = Q
+        # P = np.zeros(
+        #     (6, 6)
+        # )  # initial covariance set to zero, as position is typically reset and robots starts from rest
 
         self.kf = kalman_filter(P, Q, R, x, dt)
 
         # TODO Part 3: Use the odometry and IMU data for the EKF
-        self.odom_sub = message_filters.Subscriber(self, odom,"/odom")
-        self.imu_sub = message_filters.Subscriber(self, Imu,"/imu")
+        self.odom_sub = message_filters.Subscriber(self, odom,"/odom",qos_profile=odom_qos)
+        self.imu_sub = message_filters.Subscriber(self, Imu,"/imu",qos_profile=odom_qos)
 
         time_syncher = message_filters.ApproximateTimeSynchronizer(
             [self.odom_sub, self.imu_sub], queue_size=10, slop=0.1
@@ -96,12 +103,12 @@ class localization(Node):
         # your measurements are the linear velocity and angular velocity from odom msg
         # and linear acceleration in x and y from the imu msg
         # the kalman filter should do a proper integration to provide x,y and filter ax,ay
-        z = [
+        z = np.array([
             odom_msg.twist.twist.linear.x,
             odom_msg.twist.twist.angular.z,
             imu_msg.linear_acceleration.x,
             imu_msg.linear_acceleration.y,
-        ]
+        ])
 
         # Implement the two steps for estimation
         self.kf.predict()
@@ -112,7 +119,7 @@ class localization(Node):
         x, y, th, w, v, vdot = xhat
         stamp = self.get_clock().now().to_msg()
         # Update the pose estimate to be returned by getPose
-        self.pose = [x, y, th, stamp]
+        self.pose = np.array([x, y, th, stamp])
 
         # TODO Part 4: log your data
         self.loc_logger.log_values([z[2], z[3], vdot, v * w, v, w, x, y, Time.from_msg(stamp).nanoseconds])
@@ -124,6 +131,7 @@ class localization(Node):
             euler_from_quaternion(pose_msg.pose.pose.orientation),
             pose_msg.header.stamp,
         ]
+        self.loc_logger2.log_values([self.pose[0],self.pose[1], Time.from_msg(self.pose[3]).nanoseconds])
 
     # Return the estimated pose
     def getPose(self):
