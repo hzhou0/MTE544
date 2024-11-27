@@ -1,3 +1,5 @@
+import os
+
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import OccupancyGrid
@@ -14,7 +16,11 @@ if __name__ == "__main__":
 
     rclpy.init()
 
-    map_ = mapManipulator()
+    if "SIM" in os.environ:
+        print('using simulation map')
+        map_=mapManipulator("./test_map/map.yaml")
+    else:
+        map_ = mapManipulator()
 
     node = Node("mapPublisher")
 
