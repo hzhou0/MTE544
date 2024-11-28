@@ -54,7 +54,7 @@ def return_path(current_node: Node, maze)->list[tuple[int,int]]:
 
 
 def search(
-    maze: np.ndarray[np.float64, 2], start: tuple[int, int], end: tuple[int, int]
+    maze: np.ndarray, start: tuple[int, int], end: tuple[int, int]
 ):
     if "MANHATTAN" in os.environ:
         print("Using MANHATTAN distance")
@@ -180,7 +180,7 @@ def search(
                 continue
 
             # Make sure walkable terrain
-            if maze[node_position[0], node_position[1]] > 0.8:
+            if maze[node_position[0], node_position[1]] > 0.5:
                 continue
 
             # Create new node

@@ -55,10 +55,8 @@ class decision_maker(Node):
         self.reachThreshold = 0.05  # same as lab 2
 
         # TODO PART 5 your localization type
-        if "SIM" in os.environ:
-            self.localizer = localization(rawSensors) # some singular matrix problems with the kalmanFilter in sim
-        else:
-            self.localizer = localization(kalmanFilter)
+        self.localizer = localization(rawSensors) # some singular matrix problems with the kalmanFilter in sim
+        #self.localizer = localization(kalmanFilter)
 
         if motion_type == POINT_PLANNER:
             self.controller = controller(klp=0.2, klv=0.5, kap=0.8, kav=0.6)

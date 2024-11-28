@@ -73,9 +73,9 @@ class localization(Node):
             
             # TODO PART 5 Bonus put the Q and R matrices
             # that you conclude from lab Three
-            Q=0.3
-            R=0.7
-            P=Q*np.identity(6)
+            Q=0.3* np.identity(6)
+            R=0.7* np.identity(4)
+            P=Q
                         
             self.kf=kalman_filter(P,Q,R,x)
             

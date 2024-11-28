@@ -11,7 +11,7 @@ class Planner:
         self.type=type_
         if "SIM" in os.environ:
             print("Planner running with sim map")
-        mapName="./test_map/map.yaml"
+            mapName="./test_map/map.yaml"
         self.mapName=mapName
 
 
@@ -38,7 +38,7 @@ class Planner:
 
         # The turtlebot claims Distance Accuracy(500mm ~ 3,500mm)	±5.0%.
         # The worst case is 0.175. To be safe, we set this to 0.1.
-        self.m_utilites=mapManipulator(self.mapName, laser_sig=0.1)
+        self.m_utilites=mapManipulator(self.mapName, laser_sig=0.4)
 
         self.costMap=self.m_utilites.make_likelihood_field()
 
@@ -75,10 +75,11 @@ if __name__=="__main__":
     # map_likelihood=m_utilites.make_likelihood_field()
 
     # Testing the planner
-    planner=Planner(TRAJECTORY_PLANNER, "./test_map/map.yaml")
+    planner=Planner(TRAJECTORY_PLANNER)
     planner.initTrajectoryPlanner()
     print(planner.costMap.shape)
-    path=planner.trajectory_planner(planner.m_utilites.cell_2_position((60, 150)), planner.m_utilites.cell_2_position((10,10)))
+    #path=planner.trajectory_planner((0,0), planner.m_utilites.cell_2_position((214,53)))
+    path=planner.trajectory_planner((0,0), planner.m_utilites.cell_2_position((175,122)))
     path_cells=[planner.m_utilites.position_2_cell(point) for point in path]
     x_coords, y_coords = zip(*path_cells)
     plt.imshow(planner.costMap, cmap="gray")
